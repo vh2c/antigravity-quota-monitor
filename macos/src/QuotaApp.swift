@@ -364,5 +364,5 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 let app = NSApplication.shared
 let delegate = AppDelegate()
 app.delegate = delegate
-app.setActivationPolicy(.regular)
+app.setActivationPolicy(.accessory) // Executa como utilitário sem ícone 'exec' no Dock
 app.run()
