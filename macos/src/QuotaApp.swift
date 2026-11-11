@@ -174,6 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var autoRefreshTimer: Timer?
     var refreshBtn: NSButton?
     var isRefreshing: Bool = false
+    var isFirstLaunch: Bool = true
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         let force = CommandLine.arguments.contains("--force")
@@ -467,8 +468,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         brandBtn.attributedTitle = brandAttr
         mainView.addSubview(brandBtn)
         
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        if isFirstLaunch {
+            isFirstLaunch = false
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
     
     @objc func brandClicked() {
