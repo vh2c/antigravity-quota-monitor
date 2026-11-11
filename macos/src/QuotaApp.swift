@@ -146,14 +146,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if window == nil {
             window = NSWindow(
                 contentRect: windowRect,
-                styleMask: [.titled, .closable],
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             window.title = "Antigravity Model Quota"
             window.isReleasedWhenClosed = false
             window.delegate = self
-            window.level = .floating
+            window.level = .normal // Permite ir para segundo plano normalmente
             window.center()
         }
         

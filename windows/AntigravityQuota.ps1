@@ -48,8 +48,8 @@ function Show-QuotaWindow([switch]$Force) {
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Antigravity Model Quota" Width="460" SizeToContent="Height"
         WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow"
-        ResizeMode="NoResize" Background="#181818" Foreground="#FFFFFF"
-        Topmost="True">
+        ResizeMode="CanMinimize" Background="#181818" Foreground="#FFFFFF"
+        Topmost="False">
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI, -apple-system, sans-serif"/>
