@@ -27,10 +27,30 @@ struct QuotaData: Codable {
 }
 
 class QuotaManager {
-    static let cachePath = "/tmp/antigravity_quota_cache.json"
+    static let appSupportDir: String = {
+        let path = NSString(string: "~/Library/Application Support/AntigravityQuota").expandingTildeInPath
+        try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+        return path
+    }()
+    
+    static var cachePath: String {
+        return (appSupportDir as NSString).appendingPathComponent("quota_cache.json")
+    }
+    
+    static var lastShownPath: String {
+        return (appSupportDir as NSString).appendingPathComponent("last_shown.json")
+    }
+    
     static let fetchScript = NSString(string: "~/.gemini/config/plugins/quota-monitor/scripts/fetch_quota.js").expandingTildeInPath
     
-    static func loadQuota(force: Bool = false) -> QuotaData? {
+    static func markShown() {
+        let json: [String: Any] = ["timestamp": Date().timeIntervalSince1970]
+        if let data = try? JSONSerialization.data(withJSONObject: json) {
+            try? data.write(to: URL(fileURLWithPath: lastShownPath))
+        }
+    }
+    
+    static func loadQuota(force: Bool = false, maxRetries: Int = 6) -> QuotaData? {
         if !force {
             if let cached = readCache(), let ts = cached.timestamp, (Date().timeIntervalSince1970 - ts) < 60 {
                 var c = cached
@@ -39,7 +59,23 @@ class QuotaManager {
                 return c
             }
         }
-        return fetchLive()
+        
+        // Tenta buscar com retries para aguardar o language_server caso o Antigravity tenha acabado de abrir
+        for attempt in 1...maxRetries {
+            if let live = fetchLive() {
+                markShown()
+                return live
+            }
+            if attempt < maxRetries {
+                Thread.sleep(forTimeInterval: 1.0)
+            }
+        }
+        
+        if let cached = readCache() {
+            markShown()
+            return cached
+        }
+        return nil
     }
     
     static func readCache() -> QuotaData? {
@@ -73,7 +109,7 @@ class QuotaManager {
         } catch {
             print("Fetch error: \(error)")
         }
-        return readCache()
+        return nil
     }
 }
 

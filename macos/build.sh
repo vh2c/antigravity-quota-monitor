@@ -3,11 +3,11 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-echo "Compilando binário nativo Swift (ARM64)..."
+echo "Compilando binários nativos Swift (ARM64)..."
 mkdir -p "$SCRIPT_DIR/bin"
 swiftc -O "$SCRIPT_DIR/src/QuotaApp.swift" -o "$SCRIPT_DIR/bin/AntigravityQuota"
+swiftc -O "$SCRIPT_DIR/src/QuotaWatcher.swift" -o "$SCRIPT_DIR/bin/AntigravityWatcher"
 
 echo "Criando bundle Antigravity Quota.app..."
 APP_BUNDLE="$SCRIPT_DIR/Antigravity Quota.app"
@@ -21,4 +21,4 @@ if [ -f "/Applications/Antigravity IDE.app/Contents/Resources/Antigravity IDE.ic
 fi
 
 touch "$APP_BUNDLE"
-echo "✅ Build concluído com sucesso em: $APP_BUNDLE"
+echo "✅ Build concluído com sucesso!"
