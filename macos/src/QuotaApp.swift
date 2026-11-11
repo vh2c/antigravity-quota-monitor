@@ -252,21 +252,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         refreshBtn.wantsLayer = true
         refreshBtn.layer?.backgroundColor = btnBg.cgColor
         refreshBtn.layer?.cornerRadius = 6
-        refreshBtn.frame = NSRect(x: 20, y: 12, width: 110, height: 30)
+        refreshBtn.frame = NSRect(x: 20, y: 12, width: 104, height: 30)
         refreshBtn.keyEquivalent = "r"
         refreshBtn.keyEquivalentModifierMask = .command
+        refreshBtn.imagePosition = .imageLeading
+        refreshBtn.imageHugsTitle = true
         refreshBtn.attributedTitle = NSAttributedString(
-            string: " Atualizar",
+            string: "Atualizar",
             attributes: [
                 .foregroundColor: btnText,
                 .font: NSFont.systemFont(ofSize: 12, weight: .semibold)
             ]
         )
         if let symbol = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Atualizar") {
-            let config = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
+            let config = NSImage.SymbolConfiguration(pointSize: 10, weight: .bold)
                 .applying(.init(paletteColors: [btnText]))
             refreshBtn.image = symbol.withSymbolConfiguration(config)
-            refreshBtn.imagePosition = .imageLeading
         }
         mainView.addSubview(refreshBtn)
         
