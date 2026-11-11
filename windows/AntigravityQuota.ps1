@@ -72,12 +72,12 @@ function Show-QuotaWindow([switch]$Force) {
         <!-- Groups Container -->
         <StackPanel x:Name="GroupsPanel" Grid.Row="2"/>
 
-        <!-- Footer Buttons (Monochrome clean buttons) -->
+        <!-- Footer Buttons (Claros, alto contraste, 100% monocromáticos) -->
         <Grid Grid.Row="3" Margin="0,18,0,0">
-            <Button x:Name="BtnRefresh" Content="Atualizar" Width="85" Height="30" HorizontalAlignment="Left"
-                    Background="#1F1F1F" Foreground="#E0E0E0" BorderBrush="#2C2C2C" Cursor="Hand"/>
+            <Button x:Name="BtnRefresh" Content="Atualizar" Width="95" Height="30" HorizontalAlignment="Left"
+                    Background="#EEEEF0" Foreground="#181818" BorderBrush="#DDDDDF" FontWeight="SemiBold" Cursor="Hand"/>
             <Button x:Name="BtnClose" Content="Fechar" Width="85" Height="30" HorizontalAlignment="Right"
-                    Background="#1F1F1F" Foreground="#FFFFFF" BorderBrush="#2C2C2C" IsCancel="True" Cursor="Hand"/>
+                    Background="#EEEEF0" Foreground="#181818" BorderBrush="#DDDDDF" FontWeight="SemiBold" IsCancel="True" Cursor="Hand"/>
         </Grid>
     </Grid>
 </Window>

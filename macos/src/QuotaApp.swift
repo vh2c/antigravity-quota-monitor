@@ -242,23 +242,49 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         scrollView.documentView = contentView
         mainView.addSubview(scrollView)
         
-        // Rodapé com botões monocromáticos
-        let refreshBtn = NSButton(title: "Atualizar", target: self, action: #selector(refreshClicked))
-        refreshBtn.bezelStyle = .rounded
-        refreshBtn.frame = NSRect(x: 20, y: 12, width: 105, height: 28)
+        // Rodapé com botões claros, de alta visibilidade e 100% monocromáticos
+        let btnBg = NSColor(srgbRed: 0xEE/255.0, green: 0xEE/255.0, blue: 0xF0/255.0, alpha: 1.0)
+        let btnText = NSColor(srgbRed: 0x18/255.0, green: 0x18/255.0, blue: 0x18/255.0, alpha: 1.0)
+        
+        // Botão Atualizar
+        let refreshBtn = NSButton(title: "", target: self, action: #selector(refreshClicked))
+        refreshBtn.isBordered = false
+        refreshBtn.wantsLayer = true
+        refreshBtn.layer?.backgroundColor = btnBg.cgColor
+        refreshBtn.layer?.cornerRadius = 6
+        refreshBtn.frame = NSRect(x: 20, y: 12, width: 110, height: 30)
         refreshBtn.keyEquivalent = "r"
         refreshBtn.keyEquivalentModifierMask = .command
+        refreshBtn.attributedTitle = NSAttributedString(
+            string: " Atualizar",
+            attributes: [
+                .foregroundColor: btnText,
+                .font: NSFont.systemFont(ofSize: 12, weight: .semibold)
+            ]
+        )
         if let symbol = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Atualizar") {
-            let config = NSImage.SymbolConfiguration(pointSize: 11, weight: .regular)
+            let config = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
+                .applying(.init(paletteColors: [btnText]))
             refreshBtn.image = symbol.withSymbolConfiguration(config)
             refreshBtn.imagePosition = .imageLeading
         }
         mainView.addSubview(refreshBtn)
         
-        let closeBtn = NSButton(title: "Fechar", target: self, action: #selector(closeClicked))
-        closeBtn.bezelStyle = .rounded
-        closeBtn.frame = NSRect(x: windowWidth - 105, y: 12, width: 85, height: 28)
+        // Botão Fechar
+        let closeBtn = NSButton(title: "", target: self, action: #selector(closeClicked))
+        closeBtn.isBordered = false
+        closeBtn.wantsLayer = true
+        closeBtn.layer?.backgroundColor = btnBg.cgColor
+        closeBtn.layer?.cornerRadius = 6
+        closeBtn.frame = NSRect(x: windowWidth - 110, y: 12, width: 90, height: 30)
         closeBtn.keyEquivalent = "\u{1b}" // Esc
+        closeBtn.attributedTitle = NSAttributedString(
+            string: "Fechar",
+            attributes: [
+                .foregroundColor: btnText,
+                .font: NSFont.systemFont(ofSize: 12, weight: .semibold)
+            ]
+        )
         mainView.addSubview(closeBtn)
         
         window.makeKeyAndOrderFront(nil)
