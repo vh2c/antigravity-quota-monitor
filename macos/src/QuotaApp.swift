@@ -50,9 +50,36 @@ class QuotaManager {
         }
     }
     
-    static func loadQuota(force: Bool = false, maxRetries: Int = 6) -> QuotaData? {
+    static func findNodeBinary() -> String {
+        let fileManager = FileManager.default
+        let wellKnownPaths = [
+            "/opt/homebrew/bin/node",
+            "/usr/local/bin/node",
+            "/usr/bin/node",
+            "/bin/node"
+        ]
+        for path in wellKnownPaths {
+            if fileManager.isExecutableFile(atPath: path) {
+                return path
+            }
+        }
+        
+        let nvmBase = NSString(string: "~/.nvm/versions/node").expandingTildeInPath
+        if let versions = try? fileManager.contentsOfDirectory(atPath: nvmBase) {
+            for v in versions.sorted().reversed() {
+                let candidate = (nvmBase as NSString).appendingPathComponent("\(v)/bin/node")
+                if fileManager.isExecutableFile(atPath: candidate) {
+                    return candidate
+                }
+            }
+        }
+        
+        return "node"
+    }
+    
+    static func loadQuota(force: Bool = false, maxRetries: Int = 3) -> QuotaData? {
         if !force {
-            if let cached = readCache(), let ts = cached.timestamp, (Date().timeIntervalSince1970 - ts) < 60 {
+            if let cached = readCache(), let ts = cached.timestamp, (Date().timeIntervalSince1970 - ts) < 30 {
                 var c = cached
                 c.from_cache = true
                 c.cache_age_seconds = Int(Date().timeIntervalSince1970 - ts)
@@ -60,14 +87,13 @@ class QuotaManager {
             }
         }
         
-        // Tenta buscar com retries para aguardar o language_server caso o Antigravity tenha acabado de abrir
         for attempt in 1...maxRetries {
             if let live = fetchLive() {
                 markShown()
                 return live
             }
             if attempt < maxRetries {
-                Thread.sleep(forTimeInterval: 1.0)
+                Thread.sleep(forTimeInterval: 0.5)
             }
         }
         
@@ -84,9 +110,39 @@ class QuotaManager {
     }
     
     static func fetchLive() -> QuotaData? {
+        let nodeBin = findNodeBinary()
         let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        task.arguments = ["node", fetchScript]
+        if nodeBin.hasPrefix("/") {
+            task.executableURL = URL(fileURLWithPath: nodeBin)
+            task.arguments = [fetchScript]
+        } else {
+            task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+            task.arguments = ["node", fetchScript]
+        }
+        
+        var env = ProcessInfo.processInfo.environment
+        var searchPaths: [String] = [
+            "/opt/homebrew/bin",
+            "/opt/homebrew/sbin",
+            "/usr/local/bin",
+            "/usr/bin",
+            "/bin",
+            "/usr/sbin",
+            "/sbin"
+        ]
+        let nvmBase = NSString(string: "~/.nvm/versions/node").expandingTildeInPath
+        if let versions = try? FileManager.default.contentsOfDirectory(atPath: nvmBase) {
+            for v in versions.sorted().reversed() {
+                searchPaths.append((nvmBase as NSString).appendingPathComponent("\(v)/bin"))
+            }
+        }
+        if let currentPath = env["PATH"] {
+            searchPaths.append(currentPath)
+        }
+        env["PATH"] = searchPaths.joined(separator: ":")
+        env["HOME"] = NSHomeDirectory()
+        env["USER"] = NSUserName()
+        task.environment = env
         
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -115,16 +171,83 @@ class QuotaManager {
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var window: NSWindow!
+    var autoRefreshTimer: Timer?
+    var refreshBtn: NSButton?
+    var isRefreshing: Bool = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupUI(force: CommandLine.arguments.contains("--force"))
+        let force = CommandLine.arguments.contains("--force")
+        if let initialQuota = QuotaManager.loadQuota(force: force, maxRetries: 3) {
+            setupUI(with: initialQuota)
+            startAutoRefreshTimer()
+        } else {
+            NSApp.terminate(nil)
+        }
     }
     
-    func setupUI(force: Bool) {
-        guard let quota = QuotaManager.loadQuota(force: force) else {
-            NSApp.terminate(nil)
-            return
+    func startAutoRefreshTimer() {
+        autoRefreshTimer?.invalidate()
+        autoRefreshTimer = Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak self] _ in
+            self?.performRefresh(animated: false)
         }
+    }
+    
+    @objc func refreshClicked() {
+        performRefresh(animated: true)
+    }
+    
+    func performRefresh(animated: Bool) {
+        if isRefreshing { return }
+        isRefreshing = true
+        
+        if animated {
+            refreshBtn?.isEnabled = false
+            refreshBtn?.attributedTitle = NSAttributedString(
+                string: "Atualizando...",
+                attributes: [
+                    .foregroundColor: NSColor(white: 0.50, alpha: 1.0),
+                    .font: NSFont.systemFont(ofSize: 12, weight: .semibold)
+                ]
+            )
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let quota = QuotaManager.loadQuota(force: true, maxRetries: 2)
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isRefreshing = false
+                if let quota = quota {
+                    self.setupUI(with: quota)
+                } else {
+                    self.resetRefreshBtn()
+                }
+            }
+        }
+    }
+    
+    func resetRefreshBtn() {
+        let btnText = NSColor(srgbRed: 0x18/255.0, green: 0x18/255.0, blue: 0x18/255.0, alpha: 1.0)
+        refreshBtn?.isEnabled = true
+        refreshBtn?.attributedTitle = NSAttributedString(
+            string: "Atualizar",
+            attributes: [
+                .foregroundColor: btnText,
+                .font: NSFont.systemFont(ofSize: 12, weight: .semibold)
+            ]
+        )
+        if let symbol = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Atualizar") {
+            let config = NSImage.SymbolConfiguration(pointSize: 10, weight: .bold)
+            if #available(macOS 12.0, *) {
+                let tinted = config.applying(.init(paletteColors: [btnText]))
+                refreshBtn?.image = symbol.withSymbolConfiguration(tinted)
+            } else {
+                refreshBtn?.image = symbol.withSymbolConfiguration(config)
+                refreshBtn?.contentTintColor = btnText
+            }
+        }
+    }
+    
+    func setupUI(with quota: QuotaData) {
         
         // Cores oficiais do Antigravity: Fundo #181818, Campos #1F1F1F, 100% opaco
         let colorBg18 = NSColor(srgbRed: 0x18/255.0, green: 0x18/255.0, blue: 0x18/255.0, alpha: 1.0)
@@ -302,9 +425,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         )
         if let symbol = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Atualizar") {
             let config = NSImage.SymbolConfiguration(pointSize: 10, weight: .bold)
-                .applying(.init(paletteColors: [btnText]))
-            refreshBtn.image = symbol.withSymbolConfiguration(config)
+            if #available(macOS 12.0, *) {
+                let tinted = config.applying(.init(paletteColors: [btnText]))
+                refreshBtn.image = symbol.withSymbolConfiguration(tinted)
+            } else {
+                refreshBtn.image = symbol.withSymbolConfiguration(config)
+                refreshBtn.contentTintColor = btnText
+            }
         }
+        self.refreshBtn = refreshBtn
         mainView.addSubview(refreshBtn)
         
         // Botão Fechar
@@ -348,15 +477,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
-    @objc func refreshClicked() {
-        setupUI(force: true)
-    }
-    
     @objc func closeClicked() {
+        autoRefreshTimer?.invalidate()
+        autoRefreshTimer = nil
         NSApp.terminate(nil)
     }
     
     func windowWillClose(_ notification: Notification) {
+        autoRefreshTimer?.invalidate()
+        autoRefreshTimer = nil
         NSApp.terminate(nil)
     }
 }
