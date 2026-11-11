@@ -50,13 +50,15 @@ function extractCliPorts(commandLine) {
   return ports;
 }
 
-function formatTimeRemaining(resetTimeString) {
+function formatTimeRemaining(resetTimeString, remainingFraction = 1.0) {
   if (!resetTimeString) return '';
   const resetDate = new Date(resetTimeString);
   if (Number.isNaN(resetDate.getTime()) || resetDate.getFullYear() < 2020) return '';
   const now = new Date();
   const diffMs = resetDate - now;
-  if (diffMs <= 0) return 'Pronto';
+  if (diffMs <= 0) {
+    return (remainingFraction !== undefined && remainingFraction >= 0.99) ? '' : 'Renovando...';
+  }
   const totalMinutes = Math.floor(diffMs / (1000 * 60));
   const hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
@@ -226,7 +228,7 @@ class QuotaEngine {
       };
       for (const b of (g.buckets || [])) {
         const pct = Math.round((b.remainingFraction ?? 1) * 100);
-        const timeStr = formatTimeRemaining(b.resetTime);
+        const timeStr = formatTimeRemaining(b.resetTime, b.remainingFraction);
         gItem.buckets.push({
           id: b.bucketId || '',
           name: b.displayName || 'Limite',
