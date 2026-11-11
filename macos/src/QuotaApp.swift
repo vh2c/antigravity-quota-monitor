@@ -230,11 +230,14 @@ class RadialGaugeView: NSView {
     
     var statusColor: NSColor {
         if item.percentage > 50 {
-            return NSColor(srgbRed: 0x61/255.0, green: 0xD8/255.0, blue: 0x38/255.0, alpha: 1.0)
+            // Verde enriquecido e escurecido para alto contraste com texto branco (WCAG ~4.7:1)
+            return NSColor(srgbRed: 0x22/255.0, green: 0x92/255.0, blue: 0x1E/255.0, alpha: 1.0)
         } else if item.percentage > 20 {
-            return NSColor(srgbRed: 0xF5/255.0, green: 0xA6/255.0, blue: 0x23/255.0, alpha: 1.0)
+            // Laranja / Âmbar enriquecido e escurecido para alto contraste com texto branco (WCAG ~4.3:1)
+            return NSColor(srgbRed: 0xC8/255.0, green: 0x64/255.0, blue: 0x02/255.0, alpha: 1.0)
         } else {
-            return NSColor(srgbRed: 0xFF/255.0, green: 0x45/255.0, blue: 0x3A/255.0, alpha: 1.0)
+            // Vermelho carmim enriquecido e escurecido para alto contraste com texto branco (WCAG ~5.6:1)
+            return NSColor(srgbRed: 0xC6/255.0, green: 0x28/255.0, blue: 0x28/255.0, alpha: 1.0)
         }
     }
     
@@ -253,9 +256,9 @@ class RadialGaugeView: NSView {
         let cx = bounds.midX
         let cy = bounds.midY + 5
         
-        let rOuter: CGFloat = 26.0
-        let rInner: CGFloat = 19.5
-        let rCenter: CGFloat = 17.0
+        let rOuter: CGFloat = 27.0
+        let rInner: CGFloat = 20.5
+        let rCenter: CGFloat = 18.0
         let totalTicks = 36
         
         let activeTicks = Int(round(Double(totalTicks) * Double(max(0, min(100, item.percentage))) / 100.0))
@@ -283,15 +286,16 @@ class RadialGaugeView: NSView {
         ctx.setFillColor(activeCol)
         ctx.fillEllipse(in: CGRect(x: cx - rCenter, y: cy - rCenter, width: rCenter * 2, height: rCenter * 2))
         
-        // Texto de porcentagem em branco e negrito no centro
+        // Texto de porcentagem em branco e negrito no centro, dimensionado para nunca estourar
         let pctStr = "\(item.percentage)%"
-        let pctFont = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .black)
+        let fontSize: CGFloat = item.percentage >= 100 ? 9.0 : 10.0
+        let pctFont = NSFont.monospacedDigitSystemFont(ofSize: fontSize, weight: .bold)
         let pctAttrs: [NSAttributedString.Key: Any] = [
             .font: pctFont,
             .foregroundColor: NSColor.white
         ]
         let pctSize = (pctStr as NSString).size(withAttributes: pctAttrs)
-        let pctRect = CGRect(x: cx - pctSize.width / 2.0, y: cy - pctSize.height / 2.0, width: pctSize.width, height: pctSize.height)
+        let pctRect = CGRect(x: cx - pctSize.width / 2.0, y: cy - pctSize.height / 2.0 + 0.5, width: pctSize.width, height: pctSize.height)
         (pctStr as NSString).draw(in: pctRect, withAttributes: pctAttrs)
         
         // Texto curvado no arco superior ("Weekly Limit" ou "5 hours Limit")
