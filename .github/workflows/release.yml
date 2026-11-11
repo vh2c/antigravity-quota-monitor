@@ -1,0 +1,72 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build macOS App
+        run: |
+          chmod +x macos/build.sh
+          ./macos/build.sh
+          cd macos
+          zip -r ../Antigravity-Quota-macOS.zip "Antigravity Quota.app"
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Antigravity-Quota-macOS
+          path: Antigravity-Quota-macOS.zip
+
+  package-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Package Windows files
+        shell: pwsh
+        run: |
+          Compress-Archive -Path core, windows -DestinationPath Antigravity-Quota-Windows.zip
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Antigravity-Quota-Windows
+          path: Antigravity-Quota-Windows.zip
+
+  publish-release:
+    needs: [build-macos, package-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Antigravity-Quota-macOS
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Antigravity-Quota-Windows
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            Antigravity-Quota-macOS.zip
+            Antigravity-Quota-Windows.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
