@@ -72,10 +72,12 @@ function Show-QuotaWindow([switch]$Force) {
         <!-- Groups Container -->
         <StackPanel x:Name="GroupsPanel" Grid.Row="2"/>
 
-        <!-- Footer Buttons (Claros, alto contraste, 100% monocromáticos) -->
+        <!-- Footer Buttons & Brand (Claros, alto contraste, 100% monocromáticos) -->
         <Grid Grid.Row="3" Margin="0,18,0,0">
             <Button x:Name="BtnRefresh" Content="Atualizar" Width="95" Height="30" HorizontalAlignment="Left"
                     Background="#EEEEF0" Foreground="#181818" BorderBrush="#DDDDDF" FontWeight="SemiBold" Cursor="Hand"/>
+            <TextBlock x:Name="BrandLink" Text="vh2c.com.br" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontSize="10" Foreground="#666666" Cursor="Hand"/>
             <Button x:Name="BtnClose" Content="Fechar" Width="85" Height="30" HorizontalAlignment="Right"
                     Background="#EEEEF0" Foreground="#181818" BorderBrush="#DDDDDF" FontWeight="SemiBold" IsCancel="True" Cursor="Hand"/>
         </Grid>
@@ -89,6 +91,11 @@ function Show-QuotaWindow([switch]$Force) {
     $groupsPanel = $window.FindName("GroupsPanel")
     $btnRefresh = $window.FindName("BtnRefresh")
     $btnClose = $window.FindName("BtnClose")
+    $brandLink = $window.FindName("BrandLink")
+
+    $brandLink.add_MouseDown({
+        try { [System.Diagnostics.Process]::Start("https://vh2c.com.br") } catch {}
+    })
 
     $btnClose.add_Click({ $window.Close() })
     $btnRefresh.add_Click({

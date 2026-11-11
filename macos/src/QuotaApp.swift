@@ -324,8 +324,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         )
         mainView.addSubview(closeBtn)
         
+        // Marca vh2c.com.br centralizada no rodapé
+        let brandBtn = NSButton(title: "", target: self, action: #selector(brandClicked))
+        brandBtn.isBordered = false
+        brandBtn.frame = NSRect(x: 130, y: 17, width: windowWidth - 250, height: 20)
+        let brandAttr = NSAttributedString(
+            string: "vh2c.com.br",
+            attributes: [
+                .foregroundColor: NSColor(white: 0.40, alpha: 1.0),
+                .font: NSFont.systemFont(ofSize: 10, weight: .regular)
+            ]
+        )
+        brandBtn.attributedTitle = brandAttr
+        mainView.addSubview(brandBtn)
+        
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+    
+    @objc func brandClicked() {
+        if let url = URL(string: "https://vh2c.com.br") {
+            NSWorkspace.shared.open(url)
+        }
     }
     
     @objc func refreshClicked() {

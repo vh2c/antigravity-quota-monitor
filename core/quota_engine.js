@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
  * Antigravity Quota Engine (Cross-platform: macOS & Windows)
+ * Developed by VH2C • https://vh2c.com.br
+ * 
  * Discovers the local running Antigravity Language Server process,
  * extracts dynamic port and CSRF token, and fetches real-time model quotas.
  */

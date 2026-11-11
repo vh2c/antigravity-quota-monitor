@@ -20,5 +20,9 @@ if [ -f "/Applications/Antigravity IDE.app/Contents/Resources/Antigravity IDE.ic
     cp "/Applications/Antigravity IDE.app/Contents/Resources/Antigravity IDE.icns" "$APP_BUNDLE/Contents/Resources/applet.icns" 2>/dev/null || true
 fi
 
+# Marca e Metadados vh2c.com.br
+/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier br.com.vh2c.antigravityquota" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string br.com.vh2c.antigravityquota" "$APP_BUNDLE/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :NSHumanReadableCopyright 'Copyright © 2026 VH2C (vh2c.com.br)'" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSHumanReadableCopyright string 'Copyright © 2026 VH2C (vh2c.com.br)'" "$APP_BUNDLE/Contents/Info.plist"
+
 touch "$APP_BUNDLE"
 echo "✅ Build concluído com sucesso!"

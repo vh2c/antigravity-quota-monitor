@@ -18,13 +18,13 @@ jobs:
           chmod +x macos/build.sh
           ./macos/build.sh
           cd macos
-          zip -r ../Antigravity-Quota-macOS.zip "Antigravity Quota.app"
+          zip -r ../Antigravity-Quota-macOS-vh2c.zip "Antigravity Quota.app"
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Antigravity-Quota-macOS
-          path: Antigravity-Quota-macOS.zip
+          name: Antigravity-Quota-macOS-vh2c
+          path: Antigravity-Quota-macOS-vh2c.zip
 
   package-windows:
     runs-on: windows-latest
@@ -35,13 +35,13 @@ jobs:
       - name: Package Windows files
         shell: pwsh
         run: |
-          Compress-Archive -Path core, windows -DestinationPath Antigravity-Quota-Windows.zip
+          Compress-Archive -Path core, windows -DestinationPath Antigravity-Quota-Windows-vh2c.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Antigravity-Quota-Windows
-          path: Antigravity-Quota-Windows.zip
+          name: Antigravity-Quota-Windows-vh2c
+          path: Antigravity-Quota-Windows-vh2c.zip
 
   publish-release:
     needs: [build-macos, package-windows]
@@ -53,20 +53,20 @@ jobs:
       - name: Download macOS Artifact
         uses: actions/download-artifact@v4
         with:
-          name: Antigravity-Quota-macOS
+          name: Antigravity-Quota-macOS-vh2c
 
       - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
-          name: Antigravity-Quota-Windows
+          name: Antigravity-Quota-Windows-vh2c
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            Antigravity-Quota-macOS.zip
-            Antigravity-Quota-Windows.zip
+            Antigravity-Quota-macOS-vh2c.zip
+            Antigravity-Quota-Windows-vh2c.zip
           draft: false
           prerelease: false
           generate_release_notes: true
