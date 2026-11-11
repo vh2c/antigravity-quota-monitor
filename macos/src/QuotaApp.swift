@@ -90,6 +90,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
         
+        // Cores oficiais do Antigravity: Fundo #181818, Campos #1F1F1F, 100% opaco
+        let colorBg18 = NSColor(srgbRed: 0x18/255.0, green: 0x18/255.0, blue: 0x18/255.0, alpha: 1.0)
+        let colorField1F = NSColor(srgbRed: 0x1F/255.0, green: 0x1F/255.0, blue: 0x1F/255.0, alpha: 1.0)
+        let colorBorder = NSColor(srgbRed: 0x2C/255.0, green: 0x2C/255.0, blue: 0x2C/255.0, alpha: 1.0)
+        let colorSep = NSColor(srgbRed: 0x28/255.0, green: 0x28/255.0, blue: 0x28/255.0, alpha: 1.0)
+        let colorTrack = NSColor(srgbRed: 0x2D/255.0, green: 0x2D/255.0, blue: 0x2D/255.0, alpha: 1.0)
+        
         let windowWidth: CGFloat = 460
         var totalCardsHeight: CGFloat = 0
         for g in quota.groups {
@@ -114,27 +121,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window.center()
         }
         
-        // Fundo nativo com efeito Dark Vibrancy do macOS
-        let visualEffect = NSVisualEffectView(frame: window.contentView!.bounds)
-        visualEffect.autoresizingMask = [.width, .height]
-        visualEffect.material = .hudWindow
-        visualEffect.blendingMode = .behindWindow
-        visualEffect.state = .active
-        window.contentView = visualEffect
+        // Fundo 100% sólido sem transparência
+        window.backgroundColor = colorBg18
+        window.isOpaque = true
+        
+        let mainView = NSView(frame: window.contentView!.bounds)
+        mainView.wantsLayer = true
+        mainView.layer?.backgroundColor = colorBg18.cgColor
+        mainView.autoresizingMask = [.width, .height]
+        window.contentView = mainView
         
         // Área com scroll para o conteúdo
         let scrollViewHeight = windowHeight - 50
         let scrollView = NSScrollView(frame: NSRect(x: 0, y: 50, width: windowWidth, height: scrollViewHeight))
         scrollView.hasVerticalScroller = contentHeight > scrollViewHeight
-        scrollView.drawsBackground = false
+        scrollView.drawsBackground = true
+        scrollView.backgroundColor = colorBg18
         scrollView.autoresizingMask = [.width, .height]
         
         let actualContentHeight = max(contentHeight, scrollViewHeight)
         let contentView = NSView(frame: NSRect(x: 0, y: 0, width: windowWidth, height: actualContentHeight))
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = colorBg18.cgColor
         
         var currentY = actualContentHeight - 16
         
-        // Linha 1: Conta & Plano (sem emojis coloridos, tipografia limpa)
+        // Linha 1: Conta & Plano (sem emojis, tipografia monocromática limpa)
         let accountText = "\(quota.account) • Plano \(quota.plan ?? "Pro")"
         let accountLabel = NSTextField(labelWithString: accountText)
         accountLabel.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
@@ -153,7 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         contentView.addSubview(timeLabel)
         currentY -= 24
         
-        // Grupos de Modelos
+        // Grupos de Modelos com cartões no fundo #1F1F1F sólido
         for g in quota.groups {
             let gHeader = NSTextField(labelWithString: g.name.uppercased())
             gHeader.font = NSFont.systemFont(ofSize: 10, weight: .bold)
@@ -165,8 +177,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let cardHeight = CGFloat(g.buckets.count * 46 + 12)
             let cardView = NSBox(frame: NSRect(x: 20, y: currentY - cardHeight, width: windowWidth - 40, height: cardHeight))
             cardView.boxType = .custom
-            cardView.fillColor = NSColor(white: 0.15, alpha: 0.85)
-            cardView.borderColor = NSColor(white: 0.28, alpha: 0.7)
+            cardView.fillColor = colorField1F
+            cardView.borderColor = colorBorder
             cardView.borderWidth = 1.0
             cardView.cornerRadius = 8
             contentView.addSubview(cardView)
@@ -176,7 +188,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 if idx > 0 {
                     let sep = NSBox(frame: NSRect(x: 12, y: cardY - 2, width: cardView.frame.width - 24, height: 1))
                     sep.boxType = .custom
-                    sep.fillColor = NSColor(white: 0.22, alpha: 0.7)
+                    sep.fillColor = colorSep
                     sep.borderColor = .clear
                     cardView.addSubview(sep)
                     cardY -= 8
@@ -205,10 +217,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 cardView.addSubview(bVal)
                 cardY -= 20
                 
-                // Barra de progresso
+                // Barra de progresso com track sólido #2D2D2D
                 let barBg = NSBox(frame: NSRect(x: 14, y: cardY - 6, width: cardView.frame.width - 28, height: 6))
                 barBg.boxType = .custom
-                barBg.fillColor = NSColor(white: 0.25, alpha: 1.0)
+                barBg.fillColor = colorTrack
                 barBg.borderColor = .clear
                 barBg.cornerRadius = 3
                 cardView.addSubview(barBg)
@@ -228,7 +240,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         scrollView.documentView = contentView
-        visualEffect.addSubview(scrollView)
+        mainView.addSubview(scrollView)
         
         // Rodapé com botões monocromáticos
         let refreshBtn = NSButton(title: "Atualizar", target: self, action: #selector(refreshClicked))
@@ -241,13 +253,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             refreshBtn.image = symbol.withSymbolConfiguration(config)
             refreshBtn.imagePosition = .imageLeading
         }
-        visualEffect.addSubview(refreshBtn)
+        mainView.addSubview(refreshBtn)
         
         let closeBtn = NSButton(title: "Fechar", target: self, action: #selector(closeClicked))
         closeBtn.bezelStyle = .rounded
         closeBtn.frame = NSRect(x: windowWidth - 105, y: 12, width: 85, height: 28)
         closeBtn.keyEquivalent = "\u{1b}" // Esc
-        visualEffect.addSubview(closeBtn)
+        mainView.addSubview(closeBtn)
         
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)

@@ -48,7 +48,7 @@ function Show-QuotaWindow([switch]$Force) {
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Antigravity Model Quota" Width="460" SizeToContent="Height"
         WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow"
-        ResizeMode="NoResize" Background="#1E1E24" Foreground="#FFFFFF"
+        ResizeMode="NoResize" Background="#181818" Foreground="#FFFFFF"
         Topmost="True">
     <Window.Resources>
         <Style TargetType="TextBlock">
@@ -75,9 +75,9 @@ function Show-QuotaWindow([switch]$Force) {
         <!-- Footer Buttons (Monochrome clean buttons) -->
         <Grid Grid.Row="3" Margin="0,18,0,0">
             <Button x:Name="BtnRefresh" Content="Atualizar" Width="85" Height="30" HorizontalAlignment="Left"
-                    Background="#2A2A35" Foreground="#E0E0E0" BorderBrush="#3D3D4E" Cursor="Hand"/>
+                    Background="#1F1F1F" Foreground="#E0E0E0" BorderBrush="#2C2C2C" Cursor="Hand"/>
             <Button x:Name="BtnClose" Content="Fechar" Width="85" Height="30" HorizontalAlignment="Right"
-                    Background="#2A2A35" Foreground="#FFFFFF" BorderBrush="#3D3D4E" IsCancel="True" Cursor="Hand"/>
+                    Background="#1F1F1F" Foreground="#FFFFFF" BorderBrush="#2C2C2C" IsCancel="True" Cursor="Hand"/>
         </Grid>
     </Grid>
 </Window>
@@ -106,8 +106,8 @@ function Show-QuotaWindow([switch]$Force) {
         $groupsPanel.Children.Add($gHeader) | Out-Null
 
         $card = [System.Windows.Controls.Border]::new()
-        $card.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#282830")
-        $card.BorderBrush = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#383844")
+        $card.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#1F1F1F")
+        $card.BorderBrush = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#2C2C2C")
         $card.BorderThickness = [System.Windows.Thickness]::new(1)
         $card.CornerRadius = [System.Windows.CornerRadius]::new(8)
         $card.Padding = [System.Windows.Thickness]::new(14, 10, 14, 12)
@@ -120,7 +120,7 @@ function Show-QuotaWindow([switch]$Force) {
         foreach ($b in $g.buckets) {
             if ($bIdx -gt 0) {
                 $sep = [System.Windows.Controls.Separator]::new()
-                $sep.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#383844")
+                $sep.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#282828")
                 $sep.Margin = [System.Windows.Thickness]::new(0, 8, 0, 8)
                 $cardStack.Children.Add($sep) | Out-Null
             }
@@ -161,7 +161,7 @@ function Show-QuotaWindow([switch]$Force) {
             $pBar.Maximum = 100
             $pBar.Value = $b.remaining_pct
             $pBar.Margin = [System.Windows.Thickness]::new(0, 6, 0, 2)
-            $pBar.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#3A3A46")
+            $pBar.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#2D2D2D")
             $pBar.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString($colorHex)
             $pBar.BorderThickness = [System.Windows.Thickness]::new(0)
             $cardStack.Children.Add($pBar) | Out-Null
