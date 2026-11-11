@@ -63,19 +63,19 @@ function Show-QuotaWindow([switch]$Force) {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Subtitle Info -->
+        <!-- Subtitle Info (Monochrome, no colored emojis) -->
         <StackPanel Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="👤 $($quota.account) • Plano $($quota.plan)" FontSize="13" FontWeight="SemiBold" Foreground="#E0E0E0"/>
+            <TextBlock Text="$($quota.account) • Plano $($quota.plan)" FontSize="13" FontWeight="SemiBold" Foreground="#E0E0E0"/>
             <TextBlock Text="Atualizado às $($quota.updated_at) • Cache 60s" FontSize="11" Foreground="#9E9EA8" Margin="0,3,0,0"/>
         </StackPanel>
 
         <!-- Groups Container -->
         <StackPanel x:Name="GroupsPanel" Grid.Row="2"/>
 
-        <!-- Footer Buttons -->
+        <!-- Footer Buttons (Monochrome clean buttons) -->
         <Grid Grid.Row="3" Margin="0,18,0,0">
-            <Button x:Name="BtnRefresh" Content="🔄 Atualizar" Width="100" Height="30" HorizontalAlignment="Left"
-                    Background="#2A2A35" Foreground="#0A84FF" BorderBrush="#3D3D4E" Cursor="Hand"/>
+            <Button x:Name="BtnRefresh" Content="Atualizar" Width="85" Height="30" HorizontalAlignment="Left"
+                    Background="#2A2A35" Foreground="#E0E0E0" BorderBrush="#3D3D4E" Cursor="Hand"/>
             <Button x:Name="BtnClose" Content="Fechar" Width="85" Height="30" HorizontalAlignment="Right"
                     Background="#2A2A35" Foreground="#FFFFFF" BorderBrush="#3D3D4E" IsCancel="True" Cursor="Hand"/>
         </Grid>

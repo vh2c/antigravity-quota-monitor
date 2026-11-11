@@ -91,22 +91,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         let windowWidth: CGFloat = 460
-        var contentHeight: CGFloat = 95
+        var totalCardsHeight: CGFloat = 0
         for g in quota.groups {
-            contentHeight += 36 + CGFloat(g.buckets.count * 52)
+            totalCardsHeight += 32 + CGFloat(g.buckets.count * 48 + 14)
         }
-        contentHeight += 60 // footer
+        let contentHeight: CGFloat = 65 + totalCardsHeight + 10
+        let windowHeight = min(contentHeight + 52, 700)
         
-        let windowRect = NSRect(x: 0, y: 0, width: windowWidth, height: min(contentHeight, 720))
+        let windowRect = NSRect(x: 0, y: 0, width: windowWidth, height: windowHeight)
         
         if window == nil {
             window = NSWindow(
                 contentRect: windowRect,
-                styleMask: [.titled, .closable, .fullSizeContentView],
+                styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false
             )
-            window.titlebarAppearsTransparent = true
             window.title = "Antigravity Model Quota"
             window.isReleasedWhenClosed = false
             window.delegate = self
@@ -114,7 +114,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window.center()
         }
         
-        // Visual Effect Background (Native Dark Vibrancy)
+        // Fundo nativo com efeito Dark Vibrancy do macOS
         let visualEffect = NSVisualEffectView(frame: window.contentView!.bounds)
         visualEffect.autoresizingMask = [.width, .height]
         visualEffect.material = .hudWindow
@@ -122,54 +122,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         visualEffect.state = .active
         window.contentView = visualEffect
         
-        // Scroll view if content is tall
-        let scrollView = NSScrollView(frame: NSRect(x: 0, y: 55, width: windowWidth, height: windowRect.height - 55))
-        scrollView.hasVerticalScroller = contentHeight > 700
+        // Área com scroll para o conteúdo
+        let scrollViewHeight = windowHeight - 50
+        let scrollView = NSScrollView(frame: NSRect(x: 0, y: 50, width: windowWidth, height: scrollViewHeight))
+        scrollView.hasVerticalScroller = contentHeight > scrollViewHeight
         scrollView.drawsBackground = false
         scrollView.autoresizingMask = [.width, .height]
         
-        let contentView = NSView(frame: NSRect(x: 0, y: 0, width: windowWidth, height: contentHeight - 55))
+        let actualContentHeight = max(contentHeight, scrollViewHeight)
+        let contentView = NSView(frame: NSRect(x: 0, y: 0, width: windowWidth, height: actualContentHeight))
         
-        var currentY = contentView.frame.height - 18
+        var currentY = actualContentHeight - 16
         
-        // Account & Plan
-        let accountText = "👤 \(quota.account) • Plano \(quota.plan ?? "Pro")"
+        // Linha 1: Conta & Plano (sem emojis coloridos, tipografia limpa)
+        let accountText = "\(quota.account) • Plano \(quota.plan ?? "Pro")"
         let accountLabel = NSTextField(labelWithString: accountText)
         accountLabel.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
         accountLabel.textColor = .white
-        accountLabel.frame = NSRect(x: 24, y: currentY - 18, width: 400, height: 18)
+        accountLabel.frame = NSRect(x: 22, y: currentY - 18, width: 416, height: 18)
         contentView.addSubview(accountLabel)
         currentY -= 22
         
-        // Timestamp & cache info
+        // Linha 2: Timestamp & Status do Cache (monocromático)
         let cacheInfo = (quota.from_cache ?? false) ? " (Cache \(quota.cache_age_seconds ?? 0)s atrás)" : " (Tempo real)"
         let timeText = "Atualizado às \(quota.updated_at ?? "agora")\(cacheInfo)"
         let timeLabel = NSTextField(labelWithString: timeText)
         timeLabel.font = NSFont.systemFont(ofSize: 11, weight: .regular)
-        timeLabel.textColor = NSColor(white: 0.6, alpha: 1.0)
-        timeLabel.frame = NSRect(x: 24, y: currentY - 16, width: 400, height: 16)
+        timeLabel.textColor = NSColor(white: 0.65, alpha: 1.0)
+        timeLabel.frame = NSRect(x: 22, y: currentY - 15, width: 416, height: 15)
         contentView.addSubview(timeLabel)
         currentY -= 24
         
-        // Groups
+        // Grupos de Modelos
         for g in quota.groups {
             let gHeader = NSTextField(labelWithString: g.name.uppercased())
             gHeader.font = NSFont.systemFont(ofSize: 10, weight: .bold)
-            gHeader.textColor = NSColor(red: 0.65, green: 0.65, blue: 0.70, alpha: 1.0)
-            gHeader.frame = NSRect(x: 24, y: currentY - 16, width: 400, height: 16)
+            gHeader.textColor = NSColor(white: 0.60, alpha: 1.0)
+            gHeader.frame = NSRect(x: 22, y: currentY - 14, width: 416, height: 14)
             contentView.addSubview(gHeader)
-            currentY -= 20
+            currentY -= 18
             
-            let cardHeight = CGFloat(g.buckets.count * 48 + 12)
-            let cardView = NSBox(frame: NSRect(x: 22, y: currentY - cardHeight, width: windowWidth - 44, height: cardHeight))
+            let cardHeight = CGFloat(g.buckets.count * 46 + 12)
+            let cardView = NSBox(frame: NSRect(x: 20, y: currentY - cardHeight, width: windowWidth - 40, height: cardHeight))
             cardView.boxType = .custom
             cardView.fillColor = NSColor(white: 0.15, alpha: 0.85)
-            cardView.borderColor = NSColor(white: 0.28, alpha: 0.8)
+            cardView.borderColor = NSColor(white: 0.28, alpha: 0.7)
             cardView.borderWidth = 1.0
-            cardView.cornerRadius = 10
+            cardView.cornerRadius = 8
             contentView.addSubview(cardView)
             
-            var cardY = cardHeight - 14
+            var cardY = cardHeight - 12
             for (idx, b) in g.buckets.enumerated() {
                 if idx > 0 {
                     let sep = NSBox(frame: NSRect(x: 12, y: cardY - 2, width: cardView.frame.width - 24, height: 1))
@@ -201,9 +203,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 }
                 bVal.frame = NSRect(x: cardView.frame.width - 180, y: cardY - 18, width: 166, height: 18)
                 cardView.addSubview(bVal)
-                cardY -= 22
+                cardY -= 20
                 
-                // Progress Bar Background
+                // Barra de progresso
                 let barBg = NSBox(frame: NSRect(x: 14, y: cardY - 6, width: cardView.frame.width - 28, height: 6))
                 barBg.boxType = .custom
                 barBg.fillColor = NSColor(white: 0.25, alpha: 1.0)
@@ -211,7 +213,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 barBg.cornerRadius = 3
                 cardView.addSubview(barBg)
                 
-                // Progress Bar Fill
                 let fillWidth = max(CGFloat(barBg.frame.width) * CGFloat(b.remaining_pct) / 100.0, 4)
                 let barFill = NSBox(frame: NSRect(x: 14, y: cardY - 6, width: fillWidth, height: 6))
                 barFill.boxType = .custom
@@ -223,24 +224,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 cardY -= 14
             }
             
-            currentY -= (cardHeight + 14)
+            currentY -= (cardHeight + 12)
         }
         
         scrollView.documentView = contentView
         visualEffect.addSubview(scrollView)
         
-        // Footer Buttons
-        let refreshBtn = NSButton(title: "🔄 Atualizar", target: self, action: #selector(refreshClicked))
+        // Rodapé com botões monocromáticos
+        let refreshBtn = NSButton(title: "Atualizar", target: self, action: #selector(refreshClicked))
         refreshBtn.bezelStyle = .rounded
-        refreshBtn.frame = NSRect(x: 20, y: 14, width: 110, height: 28)
+        refreshBtn.frame = NSRect(x: 20, y: 12, width: 105, height: 28)
         refreshBtn.keyEquivalent = "r"
         refreshBtn.keyEquivalentModifierMask = .command
+        if let symbol = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Atualizar") {
+            let config = NSImage.SymbolConfiguration(pointSize: 11, weight: .regular)
+            refreshBtn.image = symbol.withSymbolConfiguration(config)
+            refreshBtn.imagePosition = .imageLeading
+        }
         visualEffect.addSubview(refreshBtn)
         
         let closeBtn = NSButton(title: "Fechar", target: self, action: #selector(closeClicked))
         closeBtn.bezelStyle = .rounded
-        closeBtn.frame = NSRect(x: windowWidth - 110, y: 14, width: 90, height: 28)
-        closeBtn.keyEquivalent = "\u{1b}" // Esc key
+        closeBtn.frame = NSRect(x: windowWidth - 105, y: 12, width: 85, height: 28)
+        closeBtn.keyEquivalent = "\u{1b}" // Esc
         visualEffect.addSubview(closeBtn)
         
         window.makeKeyAndOrderFront(nil)
