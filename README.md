@@ -1,6 +1,8 @@
 # ⚡ Antigravity Quota Monitor
 
 [![Powered by VH2C](https://img.shields.io/badge/Developed%20by-vh2c.com.br-blue.svg?style=flat-square)](https://vh2c.com.br)
+[![Total Downloads](https://img.shields.io/github/downloads/vh2c/antigravity-quota-monitor/total?style=flat-square&logo=github&color=2ea44f)](https://github.com/vh2c/antigravity-quota-monitor/releases)
+[![Latest Release](https://img.shields.io/github/v/release/vh2c/antigravity-quota-monitor?style=flat-square&logo=github&color=0969da)](https://github.com/vh2c/antigravity-quota-monitor/releases/latest)
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat-square)](#)
