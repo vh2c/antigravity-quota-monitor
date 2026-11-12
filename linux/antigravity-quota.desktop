@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Antigravity Quota
+Comment=Monitor Antigravity AI model usage quotas
+Exec=antigravity-quota
+Icon=antigravity-quota
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+Keywords=antigravity;quota;ai;gemini;claude;
+StartupWMClass=Antigravity Model Quota

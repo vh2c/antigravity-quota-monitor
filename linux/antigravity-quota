@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Antigravity Quota Monitor launcher for Linux
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "${SCRIPT_DIR}/antigravity-quota.py" "$@"

@@ -138,6 +138,21 @@ class QuotaEngine {
             if (!ports.includes(p)) ports.push(p);
           }
         }
+        // Linux fallback using ss if lsof is unavailable or returned no ports
+        if (this.platform === 'linux' && ports.length === 0) {
+          try {
+            const { stdout: ssOut } = await execAsync(`ss -tlpn 2>/dev/null`, { timeout: 3000 });
+            for (const line of ssOut.split('\n')) {
+              if (line.includes(`pid=${pid},`) || line.includes(`pid=${pid} `)) {
+                const m = line.match(/:(\d+)\s+/);
+                if (m) {
+                  const p = parseInt(m[1], 10);
+                  if (p > 1024 && !ports.includes(p)) ports.push(p);
+                }
+              }
+            }
+          } catch (_) {}
+        }
       }
     } catch (e) {}
 

@@ -1,9 +1,10 @@
 # ⚡ Antigravity Quota Monitor
 
 [![Powered by VH2C](https://img.shields.io/badge/Developed%20by-vh2c.com.br-blue.svg?style=flat-square)](https://vh2c.com.br)
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-lightgrey.svg?style=flat-square)](#)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat-square)](#)
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB.svg?style=flat-square&logo=python&logoColor=white)](#)
 [![PowerShell](https://img.shields.io/badge/PowerShell-WPF-5391FE.svg?style=flat-square)](#)
 
 An elegant, native AI usage quota monitor for **Antigravity**. Displays real-time remaining percentages for weekly and 5-hour rolling limits across **Gemini Models**, **Claude & GPT**, and **Gemini 4 Argon**, featuring live countdown timers and two distinct viewing modes.
@@ -20,6 +21,7 @@ Pre-built binaries ready for use without compiling:
 
 * 🍏 **macOS (Apple Silicon & Intel)**: Download `Antigravity-Quota-macOS-vh2c.zip`
 * 🪟 **Windows (10 & 11)**: Download `Antigravity-Quota-Windows-vh2c.zip`
+* 🐧 **Linux (Ubuntu, Debian, Fedora, Arch, etc.)**: Download `Antigravity-Quota-Linux-vh2c.tar.gz`
 
 ---
 
@@ -90,9 +92,29 @@ cd antigravity-quota-monitor/macos
 
 ---
 
+### 🐧 Linux (Ubuntu, Debian, Fedora, Arch, etc.)
+
+#### Option 1: Tarball Download (Recommended)
+1. Download `Antigravity-Quota-Linux-vh2c.tar.gz` from [Releases](../../releases/latest).
+2. Extract and run the installer:
+```bash
+tar -xzvf Antigravity-Quota-Linux-vh2c.tar.gz
+cd linux
+./install.sh
+```
+3. Run `antigravity-quota` from terminal, or launch **Antigravity Quota** directly from your desktop Application Menu!
+
+#### Option 2: CLI Terminal Mode (Headless / SSH)
+If you are on a remote server or prefer terminal output:
+```bash
+antigravity-quota --cli
+```
+
+---
+
 ## 🚀 CI/CD & Automated GitHub Releases
 
-This repository includes a ready-to-run GitHub Actions workflow in `.github/workflows/release.yml`. When a tag is pushed, GitHub builds and attaches the macOS and Windows release packages automatically:
+This repository includes a ready-to-run GitHub Actions workflow in `.github/workflows/release.yml`. When a tag is pushed, GitHub builds and attaches the macOS, Windows, and Linux release packages automatically:
 
 ```bash
 # Push release tag to trigger automated build:

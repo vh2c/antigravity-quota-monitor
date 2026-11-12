@@ -46,8 +46,25 @@ jobs:
           name: Antigravity-Quota-Windows-vh2c
           path: Antigravity-Quota-Windows-vh2c.zip
 
+  package-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Package Linux files
+        run: |
+          chmod +x linux/install.sh linux/antigravity-quota linux/antigravity-quota.py
+          tar -czvf Antigravity-Quota-Linux-vh2c.tar.gz core linux LICENSE README.md
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Antigravity-Quota-Linux-vh2c
+          path: Antigravity-Quota-Linux-vh2c.tar.gz
+
   publish-release:
-    needs: [build-macos, package-windows]
+    needs: [build-macos, package-windows, package-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,6 +80,11 @@ jobs:
         with:
           name: Antigravity-Quota-Windows-vh2c
 
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Antigravity-Quota-Linux-vh2c
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -70,6 +92,7 @@ jobs:
           files: |
             Antigravity-Quota-macOS-vh2c.zip
             Antigravity-Quota-Windows-vh2c.zip
+            Antigravity-Quota-Linux-vh2c.tar.gz
           draft: false
           prerelease: false
           generate_release_notes: true
